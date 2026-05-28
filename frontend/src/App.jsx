@@ -95,7 +95,7 @@ export default function App() {
     setLoading(true);
     setResult(null);
     try {
-      const res = await axios.post("http://localhost:8000/analyze", { code, language: lang });
+      const res = await axios.post("https://ps1-project-ai-debugging-assistant-production.up.railway.app/analyze", { code, language: lang });
       setResult(res.data);
       setHistory(prev => [{ code: code.slice(0, 60) + "…", lang, result: res.data }, ...prev.slice(0, 4)]);
     } catch (e) {
