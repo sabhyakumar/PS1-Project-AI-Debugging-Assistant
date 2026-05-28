@@ -4,6 +4,68 @@ import "./App.css";
 
 const LANGUAGES = ["Python", "JavaScript", "TypeScript", "Java", "Go", "Rust", "C++", "SQL"];
 
+const EXAMPLES = {
+  "Python": `def process_data(items):
+    total = 0
+    for i in range(len(items) + 1):  # Off-by-one error
+        total += items[i]
+    return total / len(items)
+
+result = process_data([10, 20, 30])`,
+  "JavaScript": `function getUserData(id) {
+    const user = null;
+    console.log(user.name);  // Cannot read properties of null
+    return user.id;
+}
+
+getUserData(1);`,
+  "TypeScript": `interface User {
+    name: string;
+    age: number;
+}
+
+function greet(user: User) {
+    console.log("Hello " + user.Name);  // Property 'Name' does not exist
+}`,
+  "Java": `public class Main {
+    public static void main(String[] args) {
+        int[] arr = {1, 2, 3};
+        for (int i = 0; i <= arr.length; i++) {  // ArrayIndexOutOfBoundsException
+            System.out.println(arr[i]);
+        }
+    }
+}`,
+  "Go": `package main
+
+import "fmt"
+
+func divide(a, b int) int {
+    return a / b  // division by zero
+}
+
+func main() {
+    fmt.Println(divide(10, 0))
+}`,
+  "Rust": `fn main() {
+    let v = vec![1, 2, 3];
+    let x = v[5];  // index out of bounds
+    println!("{}", x);
+}`,
+  "C++": `#include <iostream>
+using namespace std;
+
+int main() {
+    int arr[] = {1, 2, 3};
+    for (int i = 0; i <= 3; i++) {  // out of bounds
+        cout << arr[i] << endl;
+    }
+    return 0;
+}`,
+  "SQL": `SELECT name, COUNT(*)
+FROM users
+GROUP name;  -- Missing BY keyword`
+};
+
 function detectLang(code) {
   if (/def |import |print\(/.test(code)) return "Python";
   if (/function |const |let |=>/.test(code)) return "JavaScript";
@@ -33,7 +95,7 @@ export default function App() {
     setLoading(true);
     setResult(null);
     try {
-      const res = await axios.post("https://ps1-project-ai-debugging-assistant-production.up.railway.app/analyze", { code, language: lang });
+      const res = await axios.post("http://localhost:8000/analyze", { code, language: lang });
       setResult(res.data);
       setHistory(prev => [{ code: code.slice(0, 60) + "…", lang, result: res.data }, ...prev.slice(0, 4)]);
     } catch (e) {
@@ -43,14 +105,7 @@ export default function App() {
   }
 
   function loadExample() {
-    setCode(`def process_data(items):
-    total = 0
-    for i in range(len(items) + 1):  # Off-by-one error
-        total += items[i]
-    return total / len(items)
-
-result = process_data([10, 20, 30])`);
-    setLang("Python");
+    setCode(EXAMPLES[lang] || EXAMPLES["Python"]);
   }
 
   return (
